@@ -231,6 +231,23 @@ def nps(s, Fs,minfreq=None):
     Pxx=Pxx[1:]
     return freqs, Pxx 
     
+def xps(s1,s2, Fs,minfreq=None):
+    """
+    like nps, but for cross spectra: returns two vectors, frequencies and PSD
+    PSD is in units^s/Hz
+    """
+    if minfreq != None:
+        nfft=np.min([len(s1),np.int(2.*Fs/minfreq)])
+        nfft=2**(np.int(np.log2(nfft)))
+    elif minfreq == None:
+        nfft=len(s1)
+        nfft=2**(np.int(np.log2(nfft)))
+    Pxx, freqs = mlab.csd(s1,s2, NFFT=nfft, Fs = Fs)
+    #we hate zero frequency
+    freqs=freqs[1:]
+    Pxx=Pxx[1:]
+    return freqs, Pxx    
+    
 def nonlinmodel(g_0,b,t_in):
     """
     function to calculate nonlinear Vout for given input 
