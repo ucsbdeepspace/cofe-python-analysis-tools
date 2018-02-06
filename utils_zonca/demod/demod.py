@@ -80,7 +80,7 @@ def demodulate(data, freq, number_of_phases=8,phase_offset=0):
     demod_data['azi'] = data['azi']
     for ch in channels_labels:
         calibdata = data[ch]
-        channel_phase = phases.getint('%dGHz' % freq, ch)
+        channel_phase = datparsing.phases.getint('%dGHz' % freq, ch)
         q_commutator = utils.square_wave(config['SEC_PER_REV'], number_of_phases, phase=channel_phase-phase_offset)
         u_commutator = utils.square_wave(config['SEC_PER_REV'], number_of_phases, phase=channel_phase-phase_offset, U=True)
         demod_data[ch]['T'] = np.mean(calibdata,axis=1)
