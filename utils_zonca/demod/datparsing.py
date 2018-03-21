@@ -57,7 +57,7 @@ def create_revdata(raw_data, volts=True,supply_index=False):
     start_of_revs, = np.where(d['enc'] < config['ENC_START_TRIGGER'])
     if len(start_of_revs)>0:
         d = np.array(d[start_of_revs[0]:start_of_revs[-1]])
-    d = remove_noise_triggers(d)
+    #d = remove_noise_triggers(d)
     print len(start_of_revs)
     print config['ENC_START_TRIGGER']
 
