@@ -31,11 +31,9 @@ def remove_noise_triggers(d):
     tested for incomplete revolutions etc.
     """
     encoder=d['enc']/16
-    duplicates = np.diff(encoder) == 0
-    # otherwise the last sample is always discarted because
-    # there is not diff of it
-    good = np.ones(len(encoder), dtype=np.bool)
-    good[duplicates] = False
+    enc_diff=np.diff(encoder)
+    good=[i for i in range(len(enc_diff)) if (enc_diff[i] != 0)]
+    
     return d[good]
 
 def create_revdata(raw_data, volts=True,supply_index=False):
@@ -76,8 +74,14 @@ def create_revdata(raw_data, volts=True,supply_index=False):
         l.info('No invalid revolutions')
 
     # remove the samples of the bad revolutions from the array
+    #print('dshape',np.shape(d))
     for i in invalid_revs[::-1]:
-        d = np.delete(d, np.s_[start_of_revs[i]:start_of_revs[i+1]])
+	d = np.delete(d, np.s_[start_of_revs[i]:start_of_revs[i+1]])
+    #print('dshape after cleaning',np.shape(d))
+
+	
+    #for i in invalid_revs:
+      #  d = np.delete(d, np.s_[start_of_revs[i]:start_of_revs[i+1]])
 
     out_dtype = rev_dtype if volts else rev_dtype_adu
 
@@ -88,6 +92,8 @@ def create_revdata(raw_data, volts=True,supply_index=False):
     else:
         data = np.zeros(len(d)/config['SEC_PER_REV'], dtype=out_dtype)
         d_rev = d[::config['SEC_PER_REV']]
+	if len(d_rev)>len(data):
+		data=np.append(data,data[0])
         data['rev'] = d_rev['rev0'].astype(np.long) + \
                       d_rev['rev1'].astype(np.long) * 256 + \
                       d_rev['rev2'].astype(np.long) * 256**2
