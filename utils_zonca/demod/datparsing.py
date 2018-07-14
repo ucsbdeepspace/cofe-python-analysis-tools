@@ -36,7 +36,8 @@ def remove_noise_triggers(d):
     
     return d[good]
 
-def create_revdata(raw_data, volts=True,supply_index=False):
+def create_revdata(raw_data, volts=True,supply_index=False, printstatements=True):
+
     """Deletes invalid revolutions and shapes the array on revolutions
     
     Parameters
@@ -57,9 +58,11 @@ def create_revdata(raw_data, volts=True,supply_index=False):
     start_of_revs, = np.where(d['enc'] < config['ENC_START_TRIGGER'])
     if len(start_of_revs)>0:
         d = np.array(d[start_of_revs[0]:start_of_revs[-1]])
-    #d = remove_noise_triggers(d)
-    print len(start_of_revs)
-    print config['ENC_START_TRIGGER']
+    d = remove_noise_triggers(d)
+
+    if printstatements:
+        print len(start_of_revs)
+        print config['ENC_START_TRIGGER']
 
     # remove revolutions with bad number of samples 
     start_of_revs, = np.where(d['enc'] < config['ENC_START_TRIGGER'])
@@ -68,10 +71,11 @@ def create_revdata(raw_data, volts=True,supply_index=False):
     samples_per_rev = np.diff(start_of_revs)
     invalid_revs, = np.where(samples_per_rev != config['SEC_PER_REV'])
 
-    if len(invalid_revs) > 0:
-        l.warning('Removing invalid revolutions (index from beginning of file): %s' % invalid_revs)
-    else:
-        l.info('No invalid revolutions')
+    if printstatements:
+        if len(invalid_revs) > 0:
+            l.warning('Removing invalid revolutions (index from beginning of file): %s' % invalid_revs)
+        else:
+            l.info('No invalid revolutions')
 
     # remove the samples of the bad revolutions from the array
     #print('dshape',np.shape(d))
@@ -107,7 +111,7 @@ def create_revdata(raw_data, volts=True,supply_index=False):
 
     return data
 
-def read_raw(filenames, volts=True,supply_index=False):
+def read_raw(filenames, volts=True,supply_index=False, printstatements = True):
     """Reads a list of filenames, creates revdata dataset and concatenates them
     
     Parameters
@@ -123,5 +127,8 @@ def read_raw(filenames, volts=True,supply_index=False):
         reshaped concatenated array
     """
     return np.concatenate(
-                [create_revdata(open_raw(f), volts,supply_index=supply_index) for f in filenames]
+                [create_revdata(open_raw(f), volts,supply_index=supply_index, printstatements=printstatements) for f in filenames]
                          )
+
+if __name__=="__main__":
+    print 'what the fuck!!!!!!!!!'
